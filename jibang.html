@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <title>지방이</title>
+        
+        <style>
+            html, body { margin:0px; height: 100%; }
+        </style>
+        <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@v0.169.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@v0.169.0/examples/jsm/"
+            }
+        }
+        </script>
+    </head>
+<body bgcolor="#c0c0c0">
+    <script type="module">
+        import * as THREE from 'three';
+
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        var scene = new THREE.Scene();
+
+var camera = new THREE.PerspectiveCamera( 70, window.innerWidth/window.innerHeight, 0.1, 1000 );
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+scene.background = new THREE.Color( 0xffffff );
+camera.position.z = 30;
+camera.position.x = 0;
+camera.position.y = 10;
+
+
+
+// 앰비언트 조명 설치
+var ambient = new THREE.AmbientLight( 0xa1a1a1 );
+scene.add( ambient );
+
+// 비어있는 3D 오브젝트 그룹 하나 만들기
+var group = new THREE.Object3D();
+
+const loader = new GLTFLoader(); 
+loader.load(
+    'jibang.glb',  // 3D 파일 이름
+    function ( gltf ) {   // 3D 파일 로딩됐을 때 처리할 곳
+        group.add( gltf.scene); // 3D 파일 불러와서 group에 담기
+    },
+    function ( xhr ) {
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' ); // 로딩 과정 표기
+    },
+    function ( error ) {
+        console.log( 'An error happened' ); // 로딩 에러 표기
+    }
+);
+
+group.scale.set(2,2,2);  // 모델 크기 다섯 배로 키우기
+scene.add(group);  // scene에 모델 담기
+
+
+// 스포트 조명 설치
+var light = new THREE.SpotLight( 0xffffff, 5000, 0, Math.PI / 2 );
+light.position.set( 0, 30, 40 );
+light.target.position.set( 0, 0, 0 );
+scene.add( light );
+
+// 마우스 콘트롤 넣어보기
+const controls = new OrbitControls( camera, renderer.domElement );
+
+
+
+var animate = function () {
+    requestAnimationFrame( animate );
+    renderer.render(scene, camera);
+
+    // 마우스 콘트롤 상시 제어
+    controls.update();
+};
+animate();
+
+</script>
+</body>
+</html>
